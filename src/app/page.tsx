@@ -4,7 +4,6 @@ import { useState } from "react";
 import mammoth from "mammoth";
 import toast, { Toaster } from "react-hot-toast";
 
-
 export default function Home() {
   const [transcript, setTranscript] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -17,29 +16,30 @@ export default function Home() {
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    setFileName(file.name);
-    const ext = file.name.split(".").pop()?.toLowerCase();
+  setFileName(file.name);
+  const ext = file.name.split(".").pop()?.toLowerCase();
 
-    if (ext === "txt") {
-      const reader = new FileReader();
-      reader.onload = (event) => setTranscript(event.target?.result as string);
-      reader.readAsText(file);
-    }  else if (ext === "docx") {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const arrayBuffer = event.target?.result as ArrayBuffer;
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        setTranscript(result.value);
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
-      toast.error("Unsupported file type. Please upload .txt, .pdf, or .docx");
-    }
-  };
+  if (ext === "txt") {
+    const reader = new FileReader();
+    reader.onload = (event) => setTranscript(event.target?.result as string);
+    reader.readAsText(file);
+  } else if (ext === "docx") {
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const arrayBuffer = event.target?.result as ArrayBuffer;
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      setTranscript(result.value);
+    };
+    reader.readAsArrayBuffer(file);
+  }  else {
+    toast.error("Unsupported file type. Please upload .txt, .pdf, or .docx");
+  }
+};
+
 
   const handleGenerateSummary = async () => {
     if (!transcript || !prompt) {
@@ -189,7 +189,7 @@ export default function Home() {
         <button
           onClick={handleGenerateSummary}
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+          className="cursor-pointer w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
         >
           {loading ? "Generating..." : "Generate Summary"}
         </button>
@@ -226,7 +226,7 @@ export default function Home() {
                   />
                   <button
                     onClick={() => handleRemoveRecipient(i)}
-                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                    className="cursor-pointer px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
                   >
                     ✖
                   </button>
@@ -234,7 +234,7 @@ export default function Home() {
               ))}
               <button
                 onClick={handleAddRecipient}
-                className="w-full bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300"
+                className="cursor-pointer w-full bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300"
               >
                 + Add Recipient
               </button>
@@ -243,7 +243,7 @@ export default function Home() {
             <button
               onClick={handleSendEmail}
               disabled={sending}
-              className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-400"
+              className="cursor-pointer w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-400"
             >
               {sending ? "Sending..." : "Send via Email"}
             </button>
